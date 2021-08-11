@@ -20,10 +20,42 @@ namespace WebApp.Controllers
         }
 
         // GET: TaskEntry
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
-            var appDbContext = _context.TaskEntries.Include(t => t.TaskType);
-            return View(await appDbContext.ToListAsync());
+            var res = _context.TaskEntries.Include(t => t.TaskType).AsQueryable();
+            ViewData["NameSortParm"] = sortOrder == "Name" ? "name_desc" : "Name";
+            ViewData["TypeSortParm"] = sortOrder == "Type" ? "type_desc" : "Type";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["CurrentFilter"] = searchString;
+            
+            Console.WriteLine(sortOrder);
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                res = res.Where(s => s.TaskType!.Name.Contains(searchString)
+                                               || s.Date.ToString().Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "Name":
+                    res = res.OrderBy(t => t.Name);
+                    break;
+                case "Type":
+                    res = res.OrderBy(t => t.TaskType!.Name);
+                    break;
+                case "type_desc":
+                    res = res.OrderByDescending(t => t.TaskType!.Name);
+                    break;
+                case "Date":
+                    res = res.OrderBy(t => t.Date);
+                    break;
+                case "date_desc":
+                    res = res.OrderByDescending(t => t.Date);
+                    break;
+                default: 
+                    res = res.OrderByDescending(t => t.Name);
+                    break;
+            }
+            return View(await res.ToListAsync());
         }
 
         // GET: TaskEntry/Details/5
@@ -57,7 +89,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,TaskTypeId,TrackingTime,Id")] TaskEntry taskEntry)
+        public async Task<IActionResult> Create([Bind("Name,TaskTypeId,Date,From,To,Id")] TaskEntry taskEntry)
         {
             if (ModelState.IsValid)
             {
@@ -92,7 +124,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,TaskTypeId,TrackingTime,Id")] TaskEntry taskEntry)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,TaskTypeId,Date,From,To,Id")] TaskEntry taskEntry)
         {
             if (id != taskEntry.Id)
             {

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.App.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210809210252_Initial")]
+    [Migration("20210810095211_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,6 +27,12 @@ namespace DAL.App.EF.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("From")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -34,7 +40,7 @@ namespace DAL.App.EF.Migrations
                     b.Property<Guid>("TaskTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("TrackingTime")
+                    b.Property<DateTime>("To")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");

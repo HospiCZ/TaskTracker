@@ -12,9 +12,10 @@ namespace DAL.App.EF
             : base(options)
         {
         }
-        public DbSet<TaskType> TaskTypes { get; set; }
-        public DbSet<TaskEntry> TaskEntries { get; set; }
-        
+
+        public DbSet<TaskType> TaskTypes { get; set; } = default!;
+        public DbSet<TaskEntry> TaskEntries { get; set; } = default!;
+
         /*//Remove cascade delete
         protected override void OnModelCreating(ModelBuilder builder)
         {
